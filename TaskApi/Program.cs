@@ -5,6 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TaskDbContext>(opt => 
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -45,6 +47,33 @@ app.MapDelete("/tasks/{id:guid}", async (Guid id, TaskDbContext db) =>
 
     db.Tasks.Remove(task);
     await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+app.MapPut("/tasks/{id:guid}/complete", async (
+    Guid id, 
+    TaskDbContext db, 
+    IRabbitMqPublisher publisher) =>
+{
+    var task = await db.Tasks.FindAsync(id);
+    if (task is null) return Results.NotFound();
+
+    if (task.IsCompleted) return Results.Conflict(new { error = "Task already completed" });
+
+    task.IsCompleted = true;
+    task.CompletedAt = DateTimeOffset.UtcNow;
+
+    try
+    {
+        await db.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+        return Results.Conflict(new { error = "Concurrency conflict" });
+    }
+
+    publisher.PublishTaskCompleted(task.Id, task.Title, task.CompletedAt.Value, task.Priority);
+
     return Results.NoContent();
 });
 
