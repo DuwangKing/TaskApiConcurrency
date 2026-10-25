@@ -34,7 +34,7 @@ app.MapPost("/tasks", async (CreateTaskRequest req, TaskDbContext db) =>
 
 app.MapGet("/tasks", async (TaskDbContext db) =>
 {
-    // HACK: добавить пагинацию, иначе БД умрет
+    // HACK: добавить пагинацию, иначе БД умрет + IQueriable
     return Results.Ok(await db.Tasks.ToListAsync());
 });
 
