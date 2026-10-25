@@ -15,6 +15,7 @@ using (var scope = app.Services.CreateScope())
     db.Database.EnsureCreated();
 }
 
+app.Run();
 
 app.MapPost("/tasks", async (CreateTaskRequest req, TaskDbContext db) =>
 {
