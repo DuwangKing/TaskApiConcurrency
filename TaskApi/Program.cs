@@ -95,3 +95,4 @@ app.MapPut("/tasks/{id:guid}/complete", async (
 app.Run();
 
 public record CreateTaskRequest(string Title, Priority? Priority = null);
+public partial class Program { }
