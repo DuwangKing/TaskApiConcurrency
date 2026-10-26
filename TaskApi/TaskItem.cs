@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 public enum Priority { Low, Medium, High }
 
 public class TaskItem
@@ -8,5 +9,6 @@ public class TaskItem
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset? CompletedAt { get; set; } 
     public Priority Priority { get; set; } = Priority.Medium;
-    public byte[] RowVersion { get; set; } = null!; 
+     [Timestamp]
+    public uint xmin { get; set; }
 }

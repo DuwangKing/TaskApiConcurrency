@@ -12,7 +12,6 @@ public class TaskDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Title).HasMaxLength(200).IsRequired();
-            entity.Property(e => e.RowVersion).IsRowVersion(); 
         });
     }
 }
