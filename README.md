@@ -1,11 +1,11 @@
 # TaskApiConcurrency
 
 ## Технологии
--.NET 9 (Minimal API)
--PostgreSQL 15 + Entity Framework Core
--RabbitMQ 3
--Docker + Docker Compose
--xUnit + Testcontainers + Moq
+- .NET 9 (Minimal API)
+- PostgreSQL 15 + Entity Framework Core
+- RabbitMQ 3
+- Docker + Docker Compose
+- xUnit + Testcontainers + Moq
 
 ## Требования
 -Docker и Docker Compose
