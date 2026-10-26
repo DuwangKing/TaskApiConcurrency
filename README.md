@@ -8,7 +8,7 @@
 - xUnit + Testcontainers + Moq
 
 ## Требования
--Docker и Docker Compose
+- Docker и Docker Compose
 
 ## Инструкция по запуску
 1. Клонируйте репозиторий:
