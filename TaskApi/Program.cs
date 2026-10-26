@@ -7,6 +7,20 @@ builder.Services.AddDbContext<TaskDbContext>(opt =>
 
 builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
 
+//HACK: Этот блок фиксит баг с сеарилизацией enum
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
+
+    builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.Converters.Add(
+        new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -15,8 +29,7 @@ using (var scope = app.Services.CreateScope())
     db.Database.EnsureCreated();
 }
 
-app.Run();
-
+//HACK: Вынести всю Бизнес-логику из контроллеров в сервисы
 app.MapPost("/tasks", async (CreateTaskRequest req, TaskDbContext db) =>
 {
     if (string.IsNullOrWhiteSpace(req.Title) || req.Title.Length > 200)
@@ -76,6 +89,9 @@ app.MapPut("/tasks/{id:guid}/complete", async (
     publisher.PublishTaskCompleted(task.Id, task.Title, task.CompletedAt.Value, task.Priority);
 
     return Results.NoContent();
+    
 });
+
+app.Run();
 
 public record CreateTaskRequest(string Title, Priority? Priority = null);
